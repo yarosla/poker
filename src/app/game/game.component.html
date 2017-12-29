@@ -1,0 +1,9 @@
+<div *ngIf="session">
+  <h1>{{session.name}} [<a routerLink="/join/{{sessionId}}">share</a>]</h1>
+  <p>Participants ({{session.participants.length}}): <span *ngFor="let participant of session.participants; let isLast=last"> {{participant.name}}{{isLast ? '' : ', '}}</span></p>
+  <p *ngFor="let story of session.stories">Story {{story.name}}</p>
+
+  <form><input type="text" name="name" [(ngModel)]="newStoryName" placeholder="Story name...">
+    <button type="submit" (click)="addStory(newStoryName)">Add Story</button>
+  </form>
+</div>

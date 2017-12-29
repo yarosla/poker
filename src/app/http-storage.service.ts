@@ -10,9 +10,13 @@ import 'rxjs/add/operator/retryWhen';
 import 'rxjs/add/operator/repeatWhen';
 import 'rxjs/add/operator/takeWhile';
 import 'rxjs/add/operator/filter';
+import 'rxjs/add/operator/pluck';
+import 'rxjs/add/operator/toPromise';
 import {Subject} from "rxjs/Subject";
 import {ReplaySubject} from "rxjs/ReplaySubject";
 import {Observable} from "rxjs/Observable";
+
+export const POLL_TIMEOUT = 10000;
 
 export class Participant {
   id: string;
@@ -55,30 +59,30 @@ export class Session {
   stories: Story[] = [];
   votingInProgress: string = null;
 
-  constructor(name: string) {
+  constructor(name?: string) {
     this.name = name;
   }
 
   clone(): Session {
     let session = new Session(this.name);
-    session.participants = this.participants.map(p => p.clone());
-    session.stories = this.stories.map(s => s.clone());
+    session.participants = this.participants.map(p => Participant.prototype.clone.call(p));
+    session.stories = this.stories.map(s => Story.prototype.clone.call(s));
     session.votingInProgress = this.votingInProgress;
     return session;
   }
 }
 
 export class State {
-  id: string;
-  version: number;
-  lastSession: Session
+  constructor(public id?: string, public version?: number, public lastSession?: Session) {
+  }
 }
+
 
 @Injectable()
 export class HttpStorageService {
 
   state: State;
-  private participantId: string;
+  participantId: string;
   private sessionSubject: Subject<Session> = new ReplaySubject<Session>(1);
   private polling: boolean = false;
 
@@ -86,21 +90,35 @@ export class HttpStorageService {
     return this.sessionSubject.asObservable();
   }
 
+  get sessionId(): string {
+    return this.state ? this.state.id : null;
+  }
+
   constructor(private http: HttpClient) {
   }
 
-  startSession(name: string): void {
+  startSession(name: string): Promise<Session> {
     console.info('startSession', name);
     this.state = new State();
-    this.http.post<Session>('/v1/poker', new Session(name), {observe: 'response'})
-      .subscribe(this.stateExtractor);
+    return this.http.post<Session>('/v1/poker', new Session(name), {observe: 'response'})
+      .do(this.stateExtractor)
+      .map((r: HttpResponse<Session>) => r.body)
+      .toPromise<Session>();
   }
 
-  joinSession(id: string, participantName: string): void {
-    // TODO fetch session from server
+  joinSession(id: string): Promise<Session> {
+    console.info('joinSession', id);
+    this.state = new State(id);
+    return this.http.get<Session>(`/v1/poker/${this.state.id}`, {observe: 'response'})
+      .do(this.stateExtractor)
+      .map((r: HttpResponse<Session>) => r.body)
+      .toPromise<Session>();
+  }
+
+  registerParticipant(participantName: string): Promise<Session> {
     let participant = new Participant(participantName);
     this.participantId = participant.id;
-    this.updateSession(session => session.participants.push(participant));
+    return this.updateSession(session => session.participants.push(participant));
   }
 
   private stateExtractor = (response: HttpResponse<Session> | HttpErrorResponse): void => {
@@ -120,13 +138,13 @@ export class HttpStorageService {
     console.debug('got state', this.state);
   };
 
-  updateSession(updater: (session: Session) => void): void {
-    Observable.of(1)
+  updateSession(updater: (session: Session) => void): Promise<Session> {
+    return Observable.of(1)
       .mergeMap(() => {
-        let session = this.state.lastSession.clone();
+        let session = Session.prototype.clone.call(this.state.lastSession);
         console.debug('preparing', session);
         updater(session);
-        console.debug('sending', session);
+        console.debug('sending', this.state.id, session);
         return this.http.put<Session>(`/v1/poker/${this.state.id}`, session, {
           headers: {'if-match': `"${this.state.version}"`},
           observe: 'response'
@@ -140,7 +158,9 @@ export class HttpStorageService {
         console.debug('caught error', err);
         throw 'Unrecoverable error: ' + err.message;
       })
-      .subscribe(this.stateExtractor, err => console.error(err));
+      .do(this.stateExtractor, err => console.error(err))
+      .map((r: HttpResponse<Session>) => r.body)
+      .toPromise<Session>();
   }
 
   startPolling(): void {
@@ -150,7 +170,7 @@ export class HttpStorageService {
       .mergeMap(() => {
         console.debug('polling', this.state.version);
         return this.http.get<Session>(`/v1/poker/${this.state.id}`, {
-          headers: {'if-none-match': `"${this.state.version}"`, timeout: '2000'},
+          headers: {'if-none-match': `"${this.state.version}"`, timeout: POLL_TIMEOUT.toString()},
           observe: 'response'
         })
       })
@@ -169,13 +189,13 @@ export class HttpStorageService {
     this.polling = false;
   }
 
-  addStory(name: string) {
+  addStory(name: string): Promise<Session> {
     let story = new Story(name);
-    this.updateSession(session => session.stories.push(story));
+    return this.updateSession(session => session.stories.push(story));
   }
 
-  editStory(id: string, name: string): void {
-    this.updateSession(session => {
+  editStory(id: string, name: string): Promise<Session> {
+    return this.updateSession(session => {
       let story = session.stories.find(s => s.id === id);
       if (story) {
         story.name = name;
@@ -183,8 +203,8 @@ export class HttpStorageService {
     });
   }
 
-  deleteStory(id: string): void {
-    this.updateSession(session => {
+  deleteStory(id: string): Promise<Session> {
+    return this.updateSession(session => {
       let storyIndex = session.stories.findIndex(s => s.id === id);
       if (storyIndex >= 0) {
         session.stories.splice(storyIndex, 1);
@@ -192,8 +212,8 @@ export class HttpStorageService {
     });
   }
 
-  moveStoryUp(id: string): void {
-    this.updateSession(session => {
+  moveStoryUp(id: string): Promise<Session> {
+    return this.updateSession(session => {
       let stories = session.stories;
       let storyIndex = stories.findIndex(s => s.id === id);
       if (storyIndex > 0) {
@@ -203,13 +223,37 @@ export class HttpStorageService {
     });
   }
 
-  moveStoryDown(id: string): void {
-    this.updateSession(session => {
+  moveStoryDown(id: string): Promise<Session> {
+    return this.updateSession(session => {
       let stories = session.stories;
       let storyIndex = stories.findIndex(s => s.id === id);
       if (storyIndex >= 0 && storyIndex < stories.length - 1) {
         let removed = stories.splice(storyIndex, 1);
         stories.splice(storyIndex + 1, 0, removed[0]);
+      }
+    });
+  }
+
+  startVoting(storyId: string): Promise<Session> {
+    return this.updateSession(session => {
+      let story = session.stories.find(s => s.id === storyId);
+      if (story) {
+        session.votingInProgress = storyId;
+      }
+    });
+  }
+
+  stopVoting(): Promise<Session> {
+    return this.updateSession(session => {
+      session.votingInProgress = null;
+    });
+  }
+
+  vote(score: string): Promise<Session> {
+    return this.updateSession(session => {
+      let story = session.stories.find(s => s.id === session.votingInProgress);
+      if (story && this.participantId) {
+        story.votes[this.participantId] = score;
       }
     });
   }
