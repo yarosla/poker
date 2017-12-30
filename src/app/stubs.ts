@@ -3,15 +3,25 @@ import {Observable} from "rxjs/Observable";
 import {ReplaySubject} from "rxjs/ReplaySubject";
 import {Subject} from "rxjs/Subject";
 import {Injectable} from "@angular/core";
+import {Config} from "./config.service";
+import 'rxjs/add/observable/of';
+
+@Injectable()
+export class ConfigStubService {
+  config: Observable<Config>;
+
+  constructor(config?: Config) {
+    if (!config) config = {httpStoreUrl: null, pollTimeout: 1234} as Config;
+    this.config = Observable.of<Config>(config);
+  }
+}
 
 @Injectable()
 export class HttpStorageStubService {
   private sessionSubject: Subject<Session> = new ReplaySubject<Session>(1);
   private lastSession: Session;
 
-  get session(): Observable<Session> {
-    return this.sessionSubject.asObservable();
-  }
+  session = this.sessionSubject.asObservable();
 
   startSession(name: string): Promise<Session> {
     console.info('starting mock session', name);

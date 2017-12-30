@@ -10,6 +10,7 @@ import {NewSessionComponent} from './new-session/new-session.component';
 import {JoinSessionComponent} from './join-session/join-session.component';
 import {GameComponent} from './game/game.component';
 import {GameGuard} from "./game.guard";
+import {ConfigService} from "./config.service";
 
 
 const appRoutes: Routes = [
@@ -36,6 +37,7 @@ const appRoutes: Routes = [
   ],
   providers: [
     {provide: LocationStrategy, useClass: HashLocationStrategy},
+    ConfigService,
     HttpStorageService,
     GameGuard,
   ],

@@ -1,0 +1,4 @@
+{
+  "httpStoreUrl": "http://localhost:8080/v1/poker",
+  "pollTimeout": 15000
+}

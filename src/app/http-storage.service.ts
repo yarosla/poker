@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpErrorResponse, HttpResponse} from "@angular/common/http";
 import 'rxjs/add/observable/of';
 import 'rxjs/add/observable/empty';
+import 'rxjs/add/observable/timer';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/mergeMap';
@@ -10,13 +11,15 @@ import 'rxjs/add/operator/retryWhen';
 import 'rxjs/add/operator/repeatWhen';
 import 'rxjs/add/operator/takeWhile';
 import 'rxjs/add/operator/filter';
-import 'rxjs/add/operator/pluck';
+import 'rxjs/add/operator/timeout';
 import 'rxjs/add/operator/toPromise';
 import {Subject} from "rxjs/Subject";
 import {ReplaySubject} from "rxjs/ReplaySubject";
 import {Observable} from "rxjs/Observable";
+import {ConfigService} from "./config.service";
 
-export const POLL_TIMEOUT = 10000;
+const DEFAULT_POLL_TIMEOUT = 10000;
+const DEFAULT_URL = '/v1/poker';
 
 export class Participant {
   id: string;
@@ -94,24 +97,34 @@ export class HttpStorageService {
     return this.state ? this.state.id : null;
   }
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private config: ConfigService) {
   }
 
   startSession(name: string): Promise<Session> {
     console.info('startSession', name);
     this.state = new State();
-    return this.http.post<Session>('/v1/poker', new Session(name), {observe: 'response'})
-      .do(this.stateExtractor)
-      .map((r: HttpResponse<Session>) => r.body)
+    return this.config.config
+      .mergeMap(config => {
+        const url = (config.httpStoreUrl || DEFAULT_URL);
+        console.debug('sending POST', url);
+        return this.http.post<Session>(url, new Session(name), {observe: 'response'})
+          .do(this.stateExtractor)
+          .map((r: HttpResponse<Session>) => r.body);
+      })
       .toPromise<Session>();
   }
 
   joinSession(id: string): Promise<Session> {
     console.info('joinSession', id);
     this.state = new State(id);
-    return this.http.get<Session>(`/v1/poker/${this.state.id}`, {observe: 'response'})
-      .do(this.stateExtractor)
-      .map((r: HttpResponse<Session>) => r.body)
+    return this.config.config
+      .mergeMap(config => {
+        const url = (config.httpStoreUrl || DEFAULT_URL) + '/' + this.state.id;
+        console.debug('requesting GET', url);
+        return this.http.get<Session>(url, {observe: 'response'})
+          .do(this.stateExtractor)
+          .map((r: HttpResponse<Session>) => r.body)
+      })
       .toPromise<Session>();
   }
 
@@ -138,27 +151,30 @@ export class HttpStorageService {
     console.debug('got state', this.state);
   };
 
-  updateSession(updater: (session: Session) => void): Promise<Session> {
-    return Observable.of(1)
-      .mergeMap(() => {
+  updateSession(update: (session: Session) => void): Promise<Session> {
+    return this.config.config
+      .mergeMap(config => {
         let session = Session.prototype.clone.call(this.state.lastSession);
         console.debug('preparing', session);
-        updater(session);
-        console.debug('sending', this.state.id, session);
-        return this.http.put<Session>(`/v1/poker/${this.state.id}`, session, {
+        update(session);
+        const url = (config.httpStoreUrl || DEFAULT_URL) + '/' + this.state.id;
+        console.debug('sending PUT', url, session);
+        return this.http.put<Session>(url, session, {
           headers: {'if-match': `"${this.state.version}"`},
           observe: 'response'
         })
       })
-      .catch((err: HttpErrorResponse, caught) => {
-        if (err instanceof HttpErrorResponse && err.status == 412) {
-          this.stateExtractor(err);
-          return caught; // retry
-        }
-        console.debug('caught error', err);
-        throw 'Unrecoverable error: ' + err.message;
-      })
-      .do(this.stateExtractor, err => console.error(err))
+      .retryWhen(errors =>
+        errors.mergeMap(err => {
+          if (err instanceof HttpErrorResponse && err.status == 412) {
+            this.stateExtractor(err);
+            return Observable.of(1); // retry immediately
+          } else {
+            console.error('caught error', err);
+            return Observable.timer(5000); // retry after delay
+          }
+        }))
+      .do(this.stateExtractor)
       .map((r: HttpResponse<Session>) => r.body)
       .toPromise<Session>();
   }
@@ -166,20 +182,25 @@ export class HttpStorageService {
   startPolling(): void {
     if (this.polling) return;
     this.polling = true;
-    Observable.of(1)
-      .mergeMap(() => {
-        console.debug('polling', this.state.version);
-        return this.http.get<Session>(`/v1/poker/${this.state.id}`, {
-          headers: {'if-none-match': `"${this.state.version}"`, timeout: POLL_TIMEOUT.toString()},
+    this.config.config
+      .mergeMap(config => {
+        const url = (config.httpStoreUrl || DEFAULT_URL) + '/' + this.state.id;
+        console.debug('polling GET', url);
+        return this.http.get<Session>(url, {
+          headers: {
+            'if-none-match': `"${this.state.version}"`,
+            timeout: (config.pollTimeout || DEFAULT_POLL_TIMEOUT).toString()
+          },
           observe: 'response'
         })
       })
       .catch((err: HttpErrorResponse) => {
-        console.debug('caught error', err);
         if (err instanceof HttpErrorResponse && err.status == 304) {
-          return Observable.empty();
+          return Observable.empty(); // complete immediately
+        } else {
+          console.error('caught error', err);
+          return Observable.timer(5000).takeWhile(() => false); // complete with delay
         }
-        throw 'Unrecoverable error: ' + err.message;
       })
       .repeatWhen(n => n.takeWhile(() => this.polling))
       .subscribe(this.stateExtractor, err => console.error(err));
