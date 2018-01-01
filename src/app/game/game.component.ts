@@ -1,5 +1,5 @@
-import {Component, OnInit} from '@angular/core';
-import {HttpStorageService, Session} from "../http-storage.service";
+import { Component, OnInit } from '@angular/core';
+import { HttpStorageService, Session } from '../http-storage.service';
 
 @Component({
   selector: 'app-game',

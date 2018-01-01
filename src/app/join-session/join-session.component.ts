@@ -1,8 +1,8 @@
-import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute, Router} from "@angular/router";
-import "rxjs/add/operator/switchMap";
-import "rxjs/add/operator/toPromise";
-import {HttpStorageService} from "../http-storage.service";
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import 'rxjs/add/operator/switchMap';
+import 'rxjs/add/operator/toPromise';
+import { HttpStorageService } from '../http-storage.service';
 
 @Component({
   selector: 'app-join-session',

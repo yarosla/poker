@@ -1,7 +1,8 @@
-import {Injectable} from '@angular/core';
-import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
-import {Observable} from 'rxjs/Observable';
-import {HttpStorageService} from "./http-storage.service";
+import { Injectable } from '@angular/core';
+import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
+import { Observable } from 'rxjs/Observable';
+
+import { HttpStorageService } from './http-storage.service';
 
 @Injectable()
 export class GameGuard implements CanActivate {
@@ -10,8 +11,9 @@ export class GameGuard implements CanActivate {
   }
 
   canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
-    if (!this.httpStorage.sessionId)
+    if (!this.httpStorage.sessionId) {
       this.router.navigate(['new']);
+    }
     return true;
   }
 }

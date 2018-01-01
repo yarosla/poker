@@ -1,8 +1,8 @@
-export {ActivatedRoute, Router, RouterLink, RouterOutlet} from '@angular/router';
+export { ActivatedRoute, Router, RouterLink, RouterOutlet } from '@angular/router';
 
-import {Component, Directive, Injectable, Input} from '@angular/core';
-import {NavigationExtras} from '@angular/router';
-import {BehaviorSubject} from 'rxjs/BehaviorSubject';
+import { Component, Directive, Injectable, Input } from '@angular/core';
+import { NavigationExtras } from '@angular/router';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 @Directive({
   selector: '[routerLink]',
@@ -11,15 +11,15 @@ import {BehaviorSubject} from 'rxjs/BehaviorSubject';
   }
 })
 export class RouterLinkStubDirective {
-  @Input('routerLink') linkParams: any;
+  @Input() routerLink: any;
   navigatedTo: any = null;
 
   onClick() {
-    this.navigatedTo = this.linkParams;
+    this.navigatedTo = this.routerLink;
   }
 }
 
-@Component({selector: 'router-outlet', template: ''})
+@Component({ selector: 'router-outlet', template: '' })
 export class RouterOutletStubComponent {
 }
 
@@ -55,6 +55,6 @@ export class ActivatedRouteStub {
 
   // ActivatedRoute.snapshot.params
   get snapshot() {
-    return {params: this.testParams};
+    return { params: this.testParams };
   }
 }

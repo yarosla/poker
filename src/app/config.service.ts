@@ -1,6 +1,6 @@
-import {Injectable} from '@angular/core';
-import {HttpClient} from "@angular/common/http";
-import {ReplaySubject} from "rxjs/ReplaySubject";
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { ReplaySubject } from 'rxjs/ReplaySubject';
 
 export class Config {
   httpStoreUrl: string;

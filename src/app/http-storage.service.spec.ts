@@ -1,19 +1,19 @@
-import {async, fakeAsync, inject, TestBed, tick} from '@angular/core/testing';
+import { async, fakeAsync, inject, TestBed, tick } from '@angular/core/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
-import {HttpStorageService, Session, State} from './http-storage.service';
-import {HttpClientTestingModule, HttpTestingController} from "@angular/common/http/testing";
-import {ConfigStubService} from "./stubs";
-import {ConfigService} from "./config.service";
+import { HttpStorageService, Session, State } from './http-storage.service';
+import { ConfigStubService } from './stubs';
+import { ConfigService } from './config.service';
 
 describe('HttpStorageService', () => {
   const URL = '/poker';
   const TIMEOUT = 1234;
 
   beforeEach(() => {
-    const configStub = new ConfigStubService({httpStoreUrl: URL, pollTimeout: TIMEOUT});
+    const configStub = new ConfigStubService({ httpStoreUrl: URL, pollTimeout: TIMEOUT });
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [HttpStorageService, {provide: ConfigService, useValue: configStub}]
+      providers: [HttpStorageService, { provide: ConfigService, useValue: configStub }]
     });
   });
 
@@ -35,7 +35,7 @@ describe('HttpStorageService', () => {
 
         service.startSession(sessionName);
 
-        const request = httpMock.expectOne({url: URL, method: 'POST'});
+        const request = httpMock.expectOne({ url: URL, method: 'POST' });
         expect(request.request.body).toEqual(new Session(sessionName));
 
         request.flush(new Session(sessionName), {
@@ -62,9 +62,9 @@ describe('HttpStorageService', () => {
         service.joinSession(sessionId)
           .then(() => service.registerParticipant('Fred'));
 
-        const request1 = httpMock.expectOne({url: URL + '/0abcd', method: 'GET'});
+        const request1 = httpMock.expectOne({ url: URL + '/0abcd', method: 'GET' });
         request1.flush(new Session(sessionName), {
-          headers: {'ETag': '"0"'},
+          headers: { 'ETag': '"0"' },
           status: 200,
           statusText: 'OK'
         });
@@ -75,14 +75,14 @@ describe('HttpStorageService', () => {
 
         tick();
 
-        const request2 = httpMock.expectOne({url: URL + '/' + sessionId, method: 'PUT'});
+        const request2 = httpMock.expectOne({ url: URL + '/' + sessionId, method: 'PUT' });
         expect(request2.request.headers.get('if-match')).toEqual('"0"');
         expect((request2.request.body as Session).name).toEqual(sessionName);
         expect((request2.request.body as Session).participants.length).toEqual(1);
         expect((request2.request.body as Session).participants[0].name).toEqual('Fred');
 
         request2.flush(request2.request.body, {
-          headers: {'ETag': '"1"'},
+          headers: { 'ETag': '"1"' },
           status: 200,
           statusText: 'OK'
         });
@@ -101,11 +101,11 @@ describe('HttpStorageService', () => {
 
         service.updateSession(s => s.name = newName);
 
-        let request1 = httpMock.expectOne({url: URL + '/0abcd', method: 'PUT'});
+        const request1 = httpMock.expectOne({ url: URL + '/0abcd', method: 'PUT' });
         expect(request1.request.body).toEqual(new Session(newName));
 
         request1.flush(new Session(sessionName), {
-          headers: {'ETag': '"4"'},
+          headers: { 'ETag': '"4"' },
           status: 412,
           statusText: 'Precondition Failed'
         });
@@ -114,12 +114,12 @@ describe('HttpStorageService', () => {
         expect(service.state.version).toEqual(4);
         expect(service.state.lastSession).toEqual(new Session(sessionName));
 
-        let request2 = httpMock.expectOne({url: URL + '/0abcd', method: 'PUT'});
+        const request2 = httpMock.expectOne({ url: URL + '/0abcd', method: 'PUT' });
         expect(request2.request.headers.get('if-match')).toEqual('"4"');
         expect(request2.request.body).toEqual(new Session(newName));
 
         request2.flush(new Session(newName), {
-          headers: {'ETag': '"5"'},
+          headers: { 'ETag': '"5"' },
           status: 200,
           statusText: 'OK'
         });
@@ -139,12 +139,12 @@ describe('HttpStorageService', () => {
 
         service.startPolling();
 
-        let request1 = httpMock.expectOne({url: URL + '/0abcd', method: 'GET'});
+        const request1 = httpMock.expectOne({ url: URL + '/0abcd', method: 'GET' });
         expect(request1.request.headers.get('if-none-match')).toEqual('"3"');
         expect(request1.request.headers.get('timeout')).toEqual(TIMEOUT.toString());
 
         request1.flush(null, {
-          headers: {'ETag': '"3"'},
+          headers: { 'ETag': '"3"' },
           status: 304,
           statusText: 'Not Modified'
         });
@@ -152,12 +152,12 @@ describe('HttpStorageService', () => {
         expect(service.state.version).toEqual(3);
         expect(service.state.lastSession).toEqual(new Session(sessionName));
 
-        let request2 = httpMock.expectOne({url: URL + '/0abcd', method: 'GET'});
+        const request2 = httpMock.expectOne({ url: URL + '/0abcd', method: 'GET' });
         expect(request2.request.headers.get('if-none-match')).toEqual('"3"');
         expect(request2.request.headers.get('timeout')).toEqual(TIMEOUT.toString());
 
         request2.flush(new Session(newName), {
-          headers: {'ETag': '"4"'},
+          headers: { 'ETag': '"4"' },
           status: 200,
           statusText: 'OK'
         });
@@ -165,14 +165,14 @@ describe('HttpStorageService', () => {
         expect(service.state.version).toEqual(4);
         expect(service.state.lastSession).toEqual(new Session(newName));
 
-        let request3 = httpMock.expectOne({url: URL + '/0abcd', method: 'GET'});
+        const request3 = httpMock.expectOne({ url: URL + '/0abcd', method: 'GET' });
         expect(request3.request.headers.get('if-none-match')).toEqual('"4"');
         expect(request3.request.headers.get('timeout')).toEqual(TIMEOUT.toString());
 
         service.stopPolling();
 
         request3.flush(null, {
-          headers: {'ETag': '"4"'},
+          headers: { 'ETag': '"4"' },
           status: 304,
           statusText: 'Not Modified'
         });
@@ -180,6 +180,6 @@ describe('HttpStorageService', () => {
         expect(service.state.version).toEqual(4);
         expect(service.state.lastSession).toEqual(new Session(newName));
 
-        httpMock.expectNone({url: URL + '/0abcd', method: 'GET'});
+        httpMock.expectNone({ url: URL + '/0abcd', method: 'GET' });
       })));
 });

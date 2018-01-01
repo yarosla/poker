@@ -1,6 +1,6 @@
-import {Component, OnInit} from '@angular/core';
-import {Router} from "@angular/router";
-import {HttpStorageService} from "../http-storage.service";
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { HttpStorageService } from '../http-storage.service';
 
 @Component({
   selector: 'app-new-session',
@@ -9,13 +9,13 @@ import {HttpStorageService} from "../http-storage.service";
 })
 export class NewSessionComponent implements OnInit {
 
+  newSessionName: string;
+
   constructor(private httpStorage: HttpStorageService, private router: Router) {
   }
 
   ngOnInit() {
   }
-
-  newSessionName: string;
 
   startSession(name: string) {
     this.httpStorage.startSession(name)

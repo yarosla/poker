@@ -1,5 +1,4 @@
-import {Component} from '@angular/core';
-import {HttpStorageService} from "./http-storage.service";
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-root',
@@ -7,10 +6,4 @@ import {HttpStorageService} from "./http-storage.service";
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
-
-  constructor(private httpStorage: HttpStorageService) {
-  }
-
-  ngOnInit() {
-  }
 }

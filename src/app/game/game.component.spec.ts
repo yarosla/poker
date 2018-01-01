@@ -1,25 +1,25 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ActivatedRoute, Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
-import {GameComponent} from './game.component';
-import {ActivatedRoute, Router} from "@angular/router";
-import {ActivatedRouteStub, RouterLinkStubDirective, RouterStub} from "../router-stubs";
-import {HttpStorageService} from "../http-storage.service";
-import {FormsModule} from "@angular/forms";
-import {HttpStorageStubService} from "../stubs";
+import { GameComponent } from './game.component';
+import { HttpStorageService } from '../http-storage.service';
+import { ActivatedRouteStub, RouterLinkStubDirective, RouterStub } from '../router-stubs';
+import { HttpStorageStubService } from '../stubs';
 
 describe('GameComponent', () => {
   let component: GameComponent;
   let fixture: ComponentFixture<GameComponent>;
 
   beforeEach(async(() => {
-    let activatedRoute = new ActivatedRouteStub();
+    const activatedRoute = new ActivatedRouteStub();
     TestBed.configureTestingModule({
       imports: [FormsModule],
       declarations: [GameComponent, RouterLinkStubDirective],
       providers: [
-        {provide: HttpStorageService, useClass: HttpStorageStubService},
-        {provide: Router, useClass: RouterStub},
-        {provide: ActivatedRoute, useValue: activatedRoute},
+        { provide: HttpStorageService, useClass: HttpStorageStubService },
+        { provide: Router, useClass: RouterStub },
+        { provide: ActivatedRoute, useValue: activatedRoute },
       ]
     })
       .compileComponents();
