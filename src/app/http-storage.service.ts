@@ -17,6 +17,7 @@ import { Subject } from 'rxjs/Subject';
 import { ReplaySubject } from 'rxjs/ReplaySubject';
 import { Observable } from 'rxjs/Observable';
 import { ConfigService } from './config.service';
+import { Subscription } from 'rxjs/Subscription';
 
 const DEFAULT_POLL_TIMEOUT = 10000;
 const DEFAULT_URL = '/v1/poker';
@@ -87,7 +88,7 @@ export class HttpStorageService {
   state: State;
   participantId: string;
   private sessionSubject: Subject<Session> = new ReplaySubject<Session>(1);
-  private polling = false;
+  private polling: Subscription;
 
   getSession(): Observable<Session> {
     return this.sessionSubject.asObservable();
@@ -167,6 +168,8 @@ export class HttpStorageService {
   }
 
   updateSession(update: (session: Session) => void): Promise<Session> {
+    const stoppedPolling = this.stopPolling();
+    const resumePolling = stoppedPolling ? () => this.startPolling() : () => {};
     return this.config.config
       .mergeMap(config => {
         const session = Session.prototype.clone.call(this.state.lastSession);
@@ -191,13 +194,13 @@ export class HttpStorageService {
         }))
       .do(this.stateExtractor)
       .map((r: HttpResponse<Session>) => r.body)
+      .do(() => {}, () => {}, resumePolling)
       .toPromise<Session>();
   }
 
   startPolling(): void {
     if (this.polling) return;
-    this.polling = true;
-    this.config.config
+    this.polling = this.config.config
       .mergeMap(config => {
         const url = (config.httpStoreUrl || DEFAULT_URL) + '/' + this.state.id;
         console.debug('polling GET', url);
@@ -217,12 +220,15 @@ export class HttpStorageService {
           return Observable.timer(5000).takeWhile(() => false); // complete with delay
         }
       })
-      .repeatWhen(n => n.takeWhile(() => this.polling))
+      .repeatWhen(n => n.takeWhile(() => !!this.polling))
       .subscribe(this.stateExtractor, err => console.error(err));
   }
 
-  stopPolling(): void {
-    this.polling = false;
+  stopPolling(): boolean {
+    if (!this.polling) return false;
+    this.polling.unsubscribe();
+    this.polling = null;
+    return true;
   }
 
   addStory(name: string): Promise<Session> {

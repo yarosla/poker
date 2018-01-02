@@ -172,11 +172,13 @@ describe('HttpStorageService', () => {
 
         service.stopPolling();
 
+/*
         request3.flush(null, {
           headers: { 'ETag': '"4"' },
           status: 304,
           statusText: 'Not Modified'
         });
+*/
 
         expect(service.state.version).toEqual(4);
         expect(service.state.lastSession).toEqual(new Session(newName));

@@ -1,7 +1,24 @@
+div {
+  max-width: 800px;
+  margin: 20px auto;
+  text-align: center;
+}
+
+button {
+  width: 40px;
+  padding: 15px 1px;
+  margin: 0 2px;
+  background-color: white;
+  border: solid 1px #aaa;
+  cursor: pointer;
+}
+
 button.voted {
-  color: blue;
+  background-color: #d7e9f8;
 }
 
 button.confirmed {
   font-weight: bold;
+  padding: 14px 0;
+  border: solid 2px #000;
 }

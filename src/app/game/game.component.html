@@ -1,15 +1,12 @@
 <div *ngIf="session">
   <h1>{{currentParticipant?.name || 'Admin'}} @ {{session.name}} [<a routerLink="/join/{{sessionId}}">share</a>]</h1>
-  <p>Participants ({{participants.length}}): <span *ngFor="let participant of participants; let isLast=last"> <span
-    [class.current]="participant.id===currentParticipant?.id">{{participant.name}}</span>{{isLast ? '' : ', '}}</span>
-  </p>
   <app-voting-pad *ngIf="votingStory && !isAdmin" [story]="votingStory"
                   [confirmedVote]="votingStory.votes[currentParticipant.id]"
                   (vote)="httpStorage.vote($event)"></app-voting-pad>
   <table>
     <tr>
-      <th>Story</th>
-      <th *ngFor="let participant of participants" [class.current]="participant.id===currentParticipant?.id">
+      <th class="story">Story</th>
+      <th *ngFor="let participant of participants" class="score" [class.current]="participant.id===currentParticipant?.id">
         {{participant.name}}
       </th>
     </tr>
@@ -29,7 +26,7 @@
                   (click)="httpStorage.moveStoryDown(story.id)">Down</button>
         </span>
       </td>
-      <td *ngFor="let participant of participants" [class.current]="participant.id===currentParticipant?.id">
+      <td *ngFor="let participant of participants" class="score" [class.current]="participant.id===currentParticipant?.id">
         {{story.votes[participant.id]}}
       </td>
     </tr>
