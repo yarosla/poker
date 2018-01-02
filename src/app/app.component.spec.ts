@@ -3,9 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { AppComponent } from './app.component';
-import { HttpStorageService } from './http-storage.service';
 import { ActivatedRouteStub, RouterLinkStubDirective, RouterOutletStubComponent, RouterStub } from './router-stubs';
-import { HttpStorageStubService } from './stubs';
 
 
 describe('AppComponent', () => {
@@ -19,7 +17,6 @@ describe('AppComponent', () => {
         RouterLinkStubDirective, RouterOutletStubComponent
       ],
       providers: [
-        { provide: HttpStorageService, useClass: HttpStorageStubService },
         { provide: Router, useClass: RouterStub },
         { provide: ActivatedRoute, useValue: activatedRoute },
       ]

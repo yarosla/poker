@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpStorageService, Session } from '../http-storage.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-game',
@@ -12,11 +13,12 @@ export class GameComponent implements OnInit {
   sessionId: string;
   newStoryName: string;
 
-  constructor(private httpStorage: HttpStorageService) {
+  constructor(private httpStorage: HttpStorageService, private route: ActivatedRoute) {
   }
 
   ngOnInit() {
-    this.httpStorage.session.subscribe(session => {
+    this.httpStorage.getSession().subscribe(session => {
+      console.info('game start', session);
       this.session = session;
       this.sessionId = this.httpStorage.sessionId;
     });

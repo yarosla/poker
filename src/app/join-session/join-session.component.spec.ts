@@ -1,15 +1,16 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormsModule } from "@angular/forms";
+import { ActivatedRoute, Router } from "@angular/router";
+import { instance, mock } from 'ts-mockito';
 
 import { JoinSessionComponent } from './join-session.component';
-import { FormsModule } from "@angular/forms";
 import { ActivatedRouteStub, RouterStub } from "../router-stubs";
-import { ActivatedRoute, Router } from "@angular/router";
-import { HttpStorageStubService } from "../stubs";
 import { HttpStorageService } from "../http-storage.service";
 
 describe('JoinSessionComponent', () => {
   let component: JoinSessionComponent;
   let fixture: ComponentFixture<JoinSessionComponent>;
+  const httpStorageMock = mock(HttpStorageService);
 
   beforeEach(async(() => {
     const activatedRoute = new ActivatedRouteStub();
@@ -17,7 +18,7 @@ describe('JoinSessionComponent', () => {
       imports: [FormsModule],
       declarations: [JoinSessionComponent],
       providers: [
-        { provide: HttpStorageService, useClass: HttpStorageStubService },
+        { provide: HttpStorageService, useValue: instance(httpStorageMock) },
         { provide: Router, useClass: RouterStub },
         { provide: ActivatedRoute, useValue: activatedRoute },
       ]

@@ -89,6 +89,7 @@ describe('HttpStorageService', () => {
 
         expect(service.state.version).toEqual(1);
         expect(service.state.lastSession.participants[0].name).toEqual('Fred');
+        expect(service.state.lastSession.participants[0].id).toEqual(service.participantId);
       })));
 
   it('should update session after retry',

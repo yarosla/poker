@@ -1,15 +1,22 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { Observable } from 'rxjs/Observable';
+import { instance, mock, when } from 'ts-mockito';
 
 import { GameComponent } from './game.component';
-import { HttpStorageService } from '../http-storage.service';
+import { HttpStorageService, Session } from '../http-storage.service';
 import { ActivatedRouteStub, RouterLinkStubDirective, RouterStub } from '../router-stubs';
-import { HttpStorageStubService } from '../stubs';
 
 describe('GameComponent', () => {
   let component: GameComponent;
   let fixture: ComponentFixture<GameComponent>;
+  const httpStorageMock = mock(HttpStorageService);
+  when(httpStorageMock.getSession()).thenCall(() => {
+    console.info('generating new session');
+    return Observable.of(new Session('test'))
+  });
+  when(httpStorageMock.sessionId).thenReturn('0abcd');
 
   beforeEach(async(() => {
     const activatedRoute = new ActivatedRouteStub();
@@ -17,7 +24,7 @@ describe('GameComponent', () => {
       imports: [FormsModule],
       declarations: [GameComponent, RouterLinkStubDirective],
       providers: [
-        { provide: HttpStorageService, useClass: HttpStorageStubService },
+        { provide: HttpStorageService, useValue: instance(httpStorageMock) },
         { provide: Router, useClass: RouterStub },
         { provide: ActivatedRoute, useValue: activatedRoute },
       ]

@@ -26,7 +26,7 @@ export class Participant {
   name: string;
 
   constructor(name: string) {
-    this.id = Math.random().toString(36).substring(2, 5);
+    this.id = Math.random().toString(36).substring(2, 7);
     this.name = name;
   }
 
@@ -43,7 +43,7 @@ export class Story {
   votes: { [participantId: string]: string };
 
   constructor(name: string) {
-    this.id = Math.random().toString(36).substring(2, 5);
+    this.id = Math.random().toString(36).substring(2, 7);
     this.name = name;
     this.votes = {};
   }
@@ -88,6 +88,18 @@ export class HttpStorageService {
   participantId: string;
   private sessionSubject: Subject<Session> = new ReplaySubject<Session>(1);
   private polling = false;
+
+  getSession(): Observable<Session> {
+    return this.sessionSubject.asObservable();
+  }
+
+  get sessionId(): string {
+    return this.state ? this.state.id : null;
+  }
+
+  constructor(private http: HttpClient, private config: ConfigService) {
+  }
+
   private stateExtractor = (response: HttpResponse<Session> | HttpErrorResponse): void => {
     const status = response.status;
     const location = response.headers.get('location');
@@ -106,17 +118,6 @@ export class HttpStorageService {
     console.debug('got state', this.state);
   };
 
-  constructor(private http: HttpClient, private config: ConfigService) {
-  }
-
-  get session(): Observable<Session> {
-    return this.sessionSubject.asObservable();
-  }
-
-  get sessionId(): string {
-    return this.state ? this.state.id : null;
-  }
-
   startSession(name: string): Promise<Session> {
     console.info('startSession', name);
     this.state = new State();
@@ -133,6 +134,7 @@ export class HttpStorageService {
 
   joinSession(id: string): Promise<Session> {
     console.info('joinSession', id);
+    if (!id) return Promise.reject('sessionId is empty');
     this.state = new State(id);
     return this.config.config
       .mergeMap(config => {
@@ -140,7 +142,7 @@ export class HttpStorageService {
         console.debug('requesting GET', url);
         return this.http.get<Session>(url, { observe: 'response' })
           .do(this.stateExtractor)
-          .map((r: HttpResponse<Session>) => r.body)
+          .map((r: HttpResponse<Session>) => r.body);
       })
       .toPromise<Session>();
   }
@@ -149,6 +151,19 @@ export class HttpStorageService {
     const participant = new Participant(participantName);
     this.participantId = participant.id;
     return this.updateSession(session => session.participants.push(participant));
+  }
+
+  joinAsParticipant(participantId: string): Promise<Participant> {
+    if (!participantId) {
+      return Promise.reject('participantId is empty');
+    }
+    const participant = this.state.lastSession.participants.find(p => p.id === participantId);
+    if (participant) {
+      this.participantId = participant.id;
+      return Promise.resolve(participant);
+    } else {
+      return Promise.reject('no such participant');
+    }
   }
 
   updateSession(update: (session: Session) => void): Promise<Session> {

@@ -22,15 +22,15 @@ export class JoinSessionComponent implements OnInit {
   joinSession(name) {
     this.route.params
       .map(params => {
-        console.info('params', params);
-        return params.id;
+        console.debug('params', params);
+        return params.sessionId;
       })
       .subscribe((id) => {
-        console.info('params.id', id);
+        console.debug('params.sessionId', id);
         this.httpStorage.joinSession(id)
           .then(() => this.httpStorage.registerParticipant(name))
           .then(() => this.httpStorage.startPolling())
-          .then(() => this.router.navigate(['play']));
+          .then(() => this.router.navigate(['play', this.httpStorage.sessionId, this.httpStorage.participantId]));
       });
   }
 }

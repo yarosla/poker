@@ -20,6 +20,6 @@ export class NewSessionComponent implements OnInit {
   startSession(name: string) {
     this.httpStorage.startSession(name)
       .then(() => this.httpStorage.startPolling())
-      .then(() => this.router.navigate(['admin']));
+      .then(() => this.router.navigate(['admin', this.httpStorage.sessionId]));
   }
 }

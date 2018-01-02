@@ -15,9 +15,9 @@ import { ConfigService } from './config.service';
 
 const appRoutes: Routes = [
   { path: 'new', component: NewSessionComponent },
-  { path: 'join/:id', component: JoinSessionComponent },
-  { path: 'play', component: GameComponent, canActivate: [GameGuard], data: { admin: false } },
-  { path: 'admin', component: GameComponent, canActivate: [GameGuard], data: { admin: true } },
+  { path: 'join/:sessionId', component: JoinSessionComponent },
+  { path: 'play/:sessionId/:participantId', component: GameComponent, canActivate: [GameGuard], data: { admin: false } },
+  { path: 'admin/:sessionId', component: GameComponent, canActivate: [GameGuard], data: { admin: true } },
   { path: '**', redirectTo: 'new' },
 ];
 
