@@ -1,7 +1,7 @@
 export { ActivatedRoute, Router, RouterLink, RouterOutlet } from '@angular/router';
 
 import { Component, Directive, Injectable, Input } from '@angular/core';
-import { NavigationExtras } from '@angular/router';
+import { NavigationExtras, UrlSegment } from '@angular/router';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 @Directive({
@@ -34,15 +34,16 @@ export class RouterStub {
 @Injectable()
 export class ActivatedRouteStub {
 
-  // ActivatedRoute.params is Observable
-  private subject = new BehaviorSubject(this.testParams);
-  params = this.subject.asObservable();
+  private paramsSubject = new BehaviorSubject(this.testParams);
+  params = this.paramsSubject.asObservable();
+  private urlSubject = new BehaviorSubject<UrlSegment[]>(this.testUrl);
+  url = this.urlSubject.asObservable();
 
-  constructor(params?) {
-    this.testParams = this.params;
+  constructor(params?, url?) {
+    this.testParams = params || {};
+    this.testUrl = url || [];
   }
 
-// Test parameters
   private _testParams: {};
   get testParams() {
     return this._testParams;
@@ -50,7 +51,17 @@ export class ActivatedRouteStub {
 
   set testParams(params: {}) {
     this._testParams = params;
-    this.subject.next(params);
+    this.paramsSubject.next(params);
+  }
+
+  private _testUrl: UrlSegment[];
+  get testUrl() {
+    return this._testUrl;
+  }
+
+  set testUrl(url: UrlSegment[]) {
+    this._testUrl = url;
+    this.urlSubject.next(url);
   }
 
   // ActivatedRoute.snapshot.params

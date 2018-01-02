@@ -1,0 +1,7 @@
+button.voted {
+  color: blue;
+}
+
+button.confirmed {
+  font-weight: bold;
+}

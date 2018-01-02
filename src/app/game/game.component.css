@@ -1,0 +1,9 @@
+span.current {
+  font-weight: bold;
+}
+th.current {
+  color:blue;
+}
+tr.voting td.story {
+  color:blue;
+}

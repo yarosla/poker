@@ -7,6 +7,7 @@ import { instance, mock, when } from 'ts-mockito';
 import { GameComponent } from './game.component';
 import { HttpStorageService, Session } from '../http-storage.service';
 import { ActivatedRouteStub, RouterLinkStubDirective, RouterStub } from '../router-stubs';
+import { VotingPadComponent } from '../voting-pad/voting-pad.component';
 
 describe('GameComponent', () => {
   let component: GameComponent;
@@ -19,10 +20,10 @@ describe('GameComponent', () => {
   when(httpStorageMock.sessionId).thenReturn('0abcd');
 
   beforeEach(async(() => {
-    const activatedRoute = new ActivatedRouteStub();
+    const activatedRoute = new ActivatedRouteStub({}, [{path:'admin'}]);
     TestBed.configureTestingModule({
       imports: [FormsModule],
-      declarations: [GameComponent, RouterLinkStubDirective],
+      declarations: [GameComponent, RouterLinkStubDirective, VotingPadComponent],
       providers: [
         { provide: HttpStorageService, useValue: instance(httpStorageMock) },
         { provide: Router, useClass: RouterStub },

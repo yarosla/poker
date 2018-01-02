@@ -41,6 +41,7 @@ export class Story {
   id: string;
   name: string;
   votes: { [participantId: string]: string };
+  votingInProgress: boolean = false;
 
   constructor(name: string) {
     this.id = Math.random().toString(36).substring(2, 7);
@@ -51,6 +52,7 @@ export class Story {
   clone(): Story {
     const story = new Story(this.name);
     story.id = this.id;
+    story.votingInProgress = this.votingInProgress;
     story.votes = Object.assign({}, this.votes);
     return story;
   }
@@ -60,7 +62,6 @@ export class Session {
   name: string;
   participants: Participant[] = [];
   stories: Story[] = [];
-  votingInProgress: string = null;
 
   constructor(name?: string) {
     this.name = name;
@@ -70,7 +71,6 @@ export class Session {
     const session = new Session(this.name);
     session.participants = this.participants.map(p => Participant.prototype.clone.call(p));
     session.stories = this.stories.map(s => Story.prototype.clone.call(s));
-    session.votingInProgress = this.votingInProgress;
     return session;
   }
 }
@@ -273,21 +273,22 @@ export class HttpStorageService {
   startVoting(storyId: string): Promise<Session> {
     return this.updateSession(session => {
       const story = session.stories.find(s => s.id === storyId);
+      session.stories.forEach(s => s.votingInProgress = false);
       if (story) {
-        session.votingInProgress = storyId;
+        story.votingInProgress = true;
       }
     });
   }
 
   stopVoting(): Promise<Session> {
     return this.updateSession(session => {
-      session.votingInProgress = null;
+      session.stories.forEach(s => s.votingInProgress = false);
     });
   }
 
   vote(score: string): Promise<Session> {
     return this.updateSession(session => {
-      const story = session.stories.find(s => s.id === session.votingInProgress);
+      const story = session.stories.find(s => s.votingInProgress);
       if (story && this.participantId) {
         story.votes[this.participantId] = score;
       }

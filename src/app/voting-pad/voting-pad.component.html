@@ -1,0 +1,4 @@
+<div>
+  <p>Voting for {{story?.name}}</p>
+  <button type="button" *ngFor="let score of deck" (click)="doVote(score)" [class.voted]="score===voted" [class.confirmed]="score===confirmedVote">{{score}}</button>
+</div>

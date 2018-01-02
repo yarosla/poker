@@ -20,6 +20,7 @@ export class GameGuard implements CanActivate {
       .joinSession(route.params.sessionId)
       .then(session => {
         if (isAdmin) {
+          this.httpStorage.startPolling();
           return true;
         } else {
           return this.httpStorage.joinAsParticipant(route.params.participantId)

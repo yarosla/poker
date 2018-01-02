@@ -11,6 +11,7 @@ import { JoinSessionComponent } from './join-session/join-session.component';
 import { GameComponent } from './game/game.component';
 import { GameGuard } from './game.guard';
 import { ConfigService } from './config.service';
+import { VotingPadComponent } from './voting-pad/voting-pad.component';
 
 
 const appRoutes: Routes = [
@@ -28,6 +29,7 @@ const appRoutes: Routes = [
     NewSessionComponent,
     JoinSessionComponent,
     GameComponent,
+    VotingPadComponent,
   ],
   imports: [
     BrowserModule,
