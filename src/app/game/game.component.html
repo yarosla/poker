@@ -1,5 +1,6 @@
 <div *ngIf="session">
-  <h1>{{currentParticipant?.name || 'Admin'}} @ {{session.name}} [<a routerLink="/join/{{sessionId}}">share</a>]</h1>
+  <h1>{{currentParticipant?.name || 'Admin'}} @ {{session.name}}
+    <a routerLink="/join/{{sessionId}}" title="Invite more people to join"><i class="ti-share"></i></a></h1>
   <app-voting-pad *ngIf="votingStory && !isAdmin" [story]="votingStory"
                   [confirmedVote]="votingStory.votes[currentParticipant.id]"
                   (vote)="httpStorage.vote($event)"></app-voting-pad>
@@ -8,7 +9,8 @@
       <th class="story">Story</th>
       <th *ngFor="let participant of participants" class="score"
           [class.current]="participant.id===currentParticipant?.id">
-        {{participant.name}}
+        <a *ngIf="isAdmin" routerLink="/play/{{sessionId}}/{{participant.id}}">{{participant.name}}</a>
+        <span *ngIf="!isAdmin">{{participant.name}}</span>
       </th>
     </tr>
     <tr *ngFor="let story of session.stories; let isLast=last; let isFirst=first"
@@ -16,22 +18,23 @@
       <td class="story">{{story.name}}<br>
         <span *ngIf="isAdmin">
           <button *ngIf="!story.votingInProgress" type="button" title="Start voting"
-                  (click)="httpStorage.startVoting(story.id)">Start</button>
+                  (click)="httpStorage.startVoting(story.id)"><i class="ti-control-play"></i></button>
           <button *ngIf="story.votingInProgress" type="button" title="Stop voting"
-                  (click)="httpStorage.stopVoting()">Stop</button>
+                  (click)="httpStorage.stopVoting()"><i class="ti-control-stop"></i></button>
           <button *ngIf="isAdmin" type="button" title="Edit story"
-                  (click)="editStory(story.id)">Edit</button>
+                  (click)="editStory(story.id)"><i class="ti-pencil"></i></button>
           <button *ngIf="isAdmin" type="button" title="Delete story"
-                  (click)="httpStorage.deleteStory(story.id)">Delete</button>
+                  (click)="httpStorage.deleteStory(story.id)"><i class="ti-trash"></i></button>
           <button *ngIf="!isFirst" type="button" title="Move story up"
-                  (click)="httpStorage.moveStoryUp(story.id)">Up</button>
+                  (click)="httpStorage.moveStoryUp(story.id)"><i class="ti-arrow-up"></i></button>
           <button *ngIf="!isLast" type="button" title="Move story down"
-                  (click)="httpStorage.moveStoryDown(story.id)">Down</button>
+                  (click)="httpStorage.moveStoryDown(story.id)"><i class="ti-arrow-down"></i></button>
         </span>
       </td>
       <td *ngFor="let participant of participants" class="score"
           [class.current]="participant.id===currentParticipant?.id">
-        {{story.votes[participant.id]}}
+        <span *ngIf="hideVote(story, participant) && story.votes[participant.id]"><i class="ti-face-smile"></i></span>
+        <span *ngIf="!hideVote(story, participant)">{{story.votes[participant.id]}}</span>
       </td>
     </tr>
   </table>
@@ -45,5 +48,9 @@
   <form *ngIf="isAdmin">
     <textarea name="name" [(ngModel)]="newStoryNames" placeholder="Story names (one per row)..." rows="4"></textarea>
     <button type="submit" (click)="addStories()">Add Stories</button>
+  </form>
+
+  <form *ngIf="isAdmin">
+    <button type="button" (click)="saveReport()">Save Report</button>
   </form>
 </div>

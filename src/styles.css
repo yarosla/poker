@@ -5,5 +5,8 @@
 body {
   margin: 0;
   padding: 0;
+}
+
+body, input, textarea {
   font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
 }

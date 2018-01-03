@@ -4,6 +4,10 @@ div {
   text-align: center;
 }
 
+.story-name {
+  font-weight: bold;
+}
+
 button {
   width: 40px;
   padding: 15px 1px;

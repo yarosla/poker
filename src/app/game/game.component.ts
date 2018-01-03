@@ -37,6 +37,11 @@ export class GameComponent implements OnInit {
     });
   }
 
+  hideVote(story: Story, participant: Participant): boolean {
+    return !this.isAdmin && this.currentParticipant
+      && story.votingInProgress && participant.id !== this.currentParticipant.id;
+  }
+
   addStories() {
     const names = this.newStoryNames.split('\n').map(s => s.trim()).filter(s => !!s);
     if (names.length) this.httpStorage.addStories(names);
@@ -64,6 +69,25 @@ export class GameComponent implements OnInit {
     if (this.editing) {
       this.editing = null;
       this.editingStoryName = null;
+    }
+  }
+
+  saveReport(): void {
+    const filename = this.session.name + '.txt';
+    const header = ['Story'].concat(this.participants.map(p => p.name)).join('\t') + '\r\n';
+    const rows = this.session.stories.map(s =>
+      [s.name].concat(this.participants.map(p => s.votes[p.id])).join('\t')).join('\r\n');
+    const blob = new Blob([header, rows], { type: 'text/plain' });
+    if (window.navigator.msSaveOrOpenBlob) {
+      window.navigator.msSaveBlob(blob, filename);
+    }
+    else {
+      const elem = window.document.createElement('a');
+      elem.href = window.URL.createObjectURL(blob);
+      elem.download = filename;
+      document.body.appendChild(elem);
+      elem.click();
+      document.body.removeChild(elem);
     }
   }
 }
