@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { AppComponent } from './app.component';
-import { ActivatedRouteStub, RouterLinkStubDirective, RouterOutletStubComponent, RouterStub } from './router-stubs';
+import { ActivatedRouteStub, RouterLinkStubDirective, RouterOutletStubComponent, RouterStub } from '../testing/router-stubs';
 
 
 describe('AppComponent', () => {

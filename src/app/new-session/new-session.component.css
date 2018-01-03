@@ -1,0 +1,13 @@
+form button {
+  background-color: white;
+  border: solid 1px #aaa;
+  padding: 4px 6px;
+  cursor: pointer;
+}
+
+form input[type="text"]{
+  width: 300px;
+  background-color: white;
+  border: solid 1px #aaa;
+  padding: 4px 6px;
+}

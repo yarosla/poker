@@ -5,7 +5,7 @@ import { instance, mock } from 'ts-mockito';
 
 import { NewSessionComponent } from './new-session.component';
 import { HttpStorageService } from '../http-storage.service';
-import { ActivatedRouteStub, RouterStub } from '../router-stubs';
+import { ActivatedRouteStub, RouterStub } from '../../testing/router-stubs';
 
 describe('NewSessionComponent', () => {
   let component: NewSessionComponent;

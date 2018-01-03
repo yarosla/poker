@@ -2,7 +2,7 @@ import { async, fakeAsync, inject, TestBed, tick } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
 import { HttpStorageService, Session, State } from './http-storage.service';
-import { ConfigStubService } from './stubs';
+import { ConfigStubService } from '../testing/stubs';
 import { ConfigService } from './config.service';
 
 describe('HttpStorageService', () => {

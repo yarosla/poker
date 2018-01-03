@@ -3,8 +3,8 @@ import { Observable } from 'rxjs/Observable';
 import { ReplaySubject } from 'rxjs/ReplaySubject';
 import { Subject } from 'rxjs/Subject';
 import 'rxjs/add/observable/of';
-import { Config } from './config.service';
-import { Session, Story } from './http-storage.service';
+import { Config } from '../app/config.service';
+import { Session, Story } from '../app/http-storage.service';
 
 @Injectable()
 export class ConfigStubService {

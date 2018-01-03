@@ -22,3 +22,7 @@ button.confirmed {
   padding: 14px 0;
   border: solid 2px #000;
 }
+
+button:hover, button:focus{
+  background-color: #e9f3fc;
+}

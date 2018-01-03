@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { instance, mock } from 'ts-mockito';
 
 import { JoinSessionComponent } from './join-session.component';
-import { ActivatedRouteStub, RouterStub } from "../router-stubs";
+import { ActivatedRouteStub, RouterStub } from "../../testing/router-stubs";
 import { HttpStorageService } from "../http-storage.service";
 
 describe('JoinSessionComponent', () => {

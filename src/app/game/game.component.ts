@@ -12,7 +12,9 @@ export class GameComponent implements OnInit {
   isAdmin: boolean;
   session: Session;
   sessionId: string;
-  newStoryName: string;
+  newStoryNames: string;
+  editing: string;
+  editingStoryName: string;
   participants: Participant[];
   currentParticipant: Participant;
   votingStory: Story;
@@ -35,8 +37,33 @@ export class GameComponent implements OnInit {
     });
   }
 
-  addStory(name: string) {
-    console.info('addStory', name);
-    this.httpStorage.addStory(name);
+  addStories() {
+    const names = this.newStoryNames.split('\n').map(s => s.trim()).filter(s => !!s);
+    if (names.length) this.httpStorage.addStories(names);
+    this.newStoryNames = '';
+  }
+
+  editStory(storyId: string) {
+    const story = this.session.stories.find(s => s.id === storyId);
+    if (story) {
+      console.info('editing', storyId);
+      this.editing = storyId;
+      this.editingStoryName = story.name;
+    }
+  }
+
+  saveStoryEdit() {
+    if (this.editing) {
+      this.httpStorage.editStory(this.editing, this.editingStoryName);
+      this.editing = null;
+      this.editingStoryName = null;
+    }
+  }
+
+  cancelStoryEdit() {
+    if (this.editing) {
+      this.editing = null;
+      this.editingStoryName = null;
+    }
   }
 }

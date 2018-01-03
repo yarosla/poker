@@ -6,7 +6,8 @@
   <table>
     <tr>
       <th class="story">Story</th>
-      <th *ngFor="let participant of participants" class="score" [class.current]="participant.id===currentParticipant?.id">
+      <th *ngFor="let participant of participants" class="score"
+          [class.current]="participant.id===currentParticipant?.id">
         {{participant.name}}
       </th>
     </tr>
@@ -18,21 +19,31 @@
                   (click)="httpStorage.startVoting(story.id)">Start</button>
           <button *ngIf="story.votingInProgress" type="button" title="Stop voting"
                   (click)="httpStorage.stopVoting()">Stop</button>
-          <button *ngIf="isAdmin" type="button" title="Edit story">Edit</button>
-          <button *ngIf="isAdmin" type="button" title="Delete story">Delete</button>
+          <button *ngIf="isAdmin" type="button" title="Edit story"
+                  (click)="editStory(story.id)">Edit</button>
+          <button *ngIf="isAdmin" type="button" title="Delete story"
+                  (click)="httpStorage.deleteStory(story.id)">Delete</button>
           <button *ngIf="!isFirst" type="button" title="Move story up"
                   (click)="httpStorage.moveStoryUp(story.id)">Up</button>
           <button *ngIf="!isLast" type="button" title="Move story down"
                   (click)="httpStorage.moveStoryDown(story.id)">Down</button>
         </span>
       </td>
-      <td *ngFor="let participant of participants" class="score" [class.current]="participant.id===currentParticipant?.id">
+      <td *ngFor="let participant of participants" class="score"
+          [class.current]="participant.id===currentParticipant?.id">
         {{story.votes[participant.id]}}
       </td>
     </tr>
   </table>
 
-  <form *ngIf="isAdmin"><input type="text" name="name" [(ngModel)]="newStoryName" placeholder="Story name...">
-    <button type="submit" (click)="addStory(newStoryName)">Add Story</button>
+  <form *ngIf="editing">
+    <input type="text" name="name" [(ngModel)]="editingStoryName" placeholder="Story name...">
+    <button type="submit" (click)="saveStoryEdit()">Save</button>
+    <button type="button" (click)="cancelStoryEdit()">Cancel</button>
+  </form>
+
+  <form *ngIf="isAdmin">
+    <textarea name="name" [(ngModel)]="newStoryNames" placeholder="Story names (one per row)..." rows="4"></textarea>
+    <button type="submit" (click)="addStories()">Add Stories</button>
   </form>
 </div>

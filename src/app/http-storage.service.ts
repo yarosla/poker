@@ -236,6 +236,15 @@ export class HttpStorageService {
     return this.updateSession(session => session.stories.push(story));
   }
 
+  addStories(names: string[]): Promise<Session> {
+    return this.updateSession(session => {
+      names.forEach(name => {
+        const story = new Story(name);
+        session.stories.push(story);
+      });
+    });
+  }
+
   editStory(id: string, name: string): Promise<Session> {
     return this.updateSession(session => {
       const story = session.stories.find(s => s.id === id);
