@@ -14,8 +14,8 @@ backend to store session data.
 1. Download release archive from [Releases](https://github.com/yarosla/poker/releases) page. Unpack it.
 2. Run commands:
 
-    cd poker-release
-    java -jar http-shared-storage-1.0.jar -P 8080 -s poker
+        cd poker-release
+        java -jar http-shared-storage-1.0.jar -P 8080 -s poker
     
 3. Point your browser to `http://localhost:8080/index.html`
 
