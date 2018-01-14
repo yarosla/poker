@@ -27,6 +27,7 @@ describe('GameGuard', () => {
   it('should allow access to admin', fakeAsync(inject([GameGuard], (guard: GameGuard) => {
     when(routeMock.params).thenReturn({ sessionId: '0abcd' });
     when(routeMock.url).thenReturn([{ path: 'admin' } as UrlSegment]);
+    when(routeMock.data).thenReturn({ admin: true });
     when(httpStorageMock.joinSession('0abcd'))
       .thenCall(() => Promise.resolve(new Session()));
 
@@ -43,6 +44,7 @@ describe('GameGuard', () => {
   it('should allow access to player', fakeAsync(inject([GameGuard], (guard: GameGuard) => {
     when(routeMock.params).thenReturn({ sessionId: '0abcd', participantId: 'fgh' });
     when(routeMock.url).thenReturn([{ path: 'play' } as UrlSegment]);
+    when(routeMock.data).thenReturn({});
     when(httpStorageMock.joinSession('0abcd'))
       .thenCall(() => Promise.resolve(new Session()));
     when(httpStorageMock.joinAsParticipant('fgh'))
@@ -58,9 +60,27 @@ describe('GameGuard', () => {
     verify(routerMock.navigate(anything())).never();
   })));
 
+  it('should allow access to observer', fakeAsync(inject([GameGuard], (guard: GameGuard) => {
+    when(routeMock.params).thenReturn({ sessionId: '0abcd' });
+    when(routeMock.url).thenReturn([{ path: 'observe' } as UrlSegment]);
+    when(routeMock.data).thenReturn({ observer: true });
+    when(httpStorageMock.joinSession('0abcd'))
+      .thenCall(() => Promise.resolve(new Session()));
+
+    Promise.resolve(guard.canActivate(instance(routeMock), null) as boolean)
+      .then(can => expect(can).toEqual(true),
+        err => expect(err).toBeUndefined());
+
+    tick();
+    verify(httpStorageMock.joinSession('0abcd')).once();
+    verify(httpStorageMock.joinAsParticipant(anything())).never();
+    verify(routerMock.navigate(anything())).never();
+  })));
+
   it('should deny access to play on short url', fakeAsync(inject([GameGuard], (guard: GameGuard) => {
     when(routeMock.params).thenReturn({ sessionId: '0abcd' });
     when(routeMock.url).thenReturn([{ path: 'play' } as UrlSegment]);
+    when(routeMock.data).thenReturn({});
     when(httpStorageMock.joinSession('0abcd'))
       .thenCall(() => Promise.resolve(new Session()));
     when(httpStorageMock.joinAsParticipant(undefined))
@@ -79,6 +99,7 @@ describe('GameGuard', () => {
   it('should deny access to play on shortest url', fakeAsync(inject([GameGuard], (guard: GameGuard) => {
     when(routeMock.params).thenReturn({});
     when(routeMock.url).thenReturn([{ path: 'play' } as UrlSegment]);
+    when(routeMock.data).thenReturn({});
     when(httpStorageMock.joinSession(undefined))
       .thenCall(sessionId => Promise.reject('no such session ' + sessionId));
 
@@ -95,6 +116,7 @@ describe('GameGuard', () => {
   it('should deny access to wrong player', fakeAsync(inject([GameGuard], (guard: GameGuard) => {
     when(routeMock.params).thenReturn({ sessionId: '0abcd', participantId: 'jkl' });
     when(routeMock.url).thenReturn([{ path: 'play' } as UrlSegment]);
+    when(routeMock.data).thenReturn({});
     when(httpStorageMock.joinSession('0abcd'))
       .thenCall(() => Promise.resolve(new Session()));
     when(httpStorageMock.joinAsParticipant('jkl'))
@@ -113,6 +135,7 @@ describe('GameGuard', () => {
   it('should deny access to play wrong session', fakeAsync(inject([GameGuard], (guard: GameGuard) => {
     when(routeMock.params).thenReturn({ sessionId: '1abcd', participantId: 'fgh' });
     when(routeMock.url).thenReturn([{ path: 'play' } as UrlSegment]);
+    when(routeMock.data).thenReturn({});
     when(httpStorageMock.joinSession('1abcd'))
       .thenCall(sessionId => Promise.reject('no such session ' + sessionId));
 

@@ -1,7 +1,7 @@
 <div *ngIf="session">
-  <h1>{{currentParticipant?.name || 'Admin'}} @ {{session.name}}
+  <h1>{{currentParticipant?.name || (isAdmin?'Admin':'Observer')}} @ {{session.name}}
     <a routerLink="/join/{{sessionId}}" title="Invite more people to join"><i class="ti-share"></i></a></h1>
-  <app-voting-pad *ngIf="votingStory && !isAdmin" [story]="votingStory"
+  <app-voting-pad *ngIf="votingStory && !isAdmin && !isObserver" [story]="votingStory"
                   [confirmedVote]="votingStory.votes[currentParticipant.id]"
                   (vote)="httpStorage.vote($event)"></app-voting-pad>
   <table>

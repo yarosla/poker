@@ -1,19 +1,23 @@
 import { async, fakeAsync, inject, TestBed, tick } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { Observable } from "rxjs/Observable";
+import { instance, mock, when } from 'ts-mockito';
 
 import { HttpStorageService, Session, State } from './http-storage.service';
-import { ConfigStubService } from '../testing/stubs';
-import { ConfigService } from './config.service';
+import { Config, ConfigService } from './config.service';
 
 describe('HttpStorageService', () => {
   const URL = '/poker';
   const TIMEOUT = 1234;
+  const configMock = mock(ConfigService);
+  const configObservable = Observable.of<Config>({ httpStoreUrl: URL, pollTimeout: TIMEOUT });
+
+  when(configMock.getConfig()).thenReturn(configObservable);
 
   beforeEach(() => {
-    const configStub = new ConfigStubService({ httpStoreUrl: URL, pollTimeout: TIMEOUT });
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [HttpStorageService, { provide: ConfigService, useValue: configStub }]
+      providers: [HttpStorageService, { provide: ConfigService, useValue: instance(configMock) }]
     });
   });
 
@@ -171,14 +175,6 @@ describe('HttpStorageService', () => {
         expect(request3.request.headers.get('timeout')).toEqual(TIMEOUT.toString());
 
         service.stopPolling();
-
-/*
-        request3.flush(null, {
-          headers: { 'ETag': '"4"' },
-          status: 304,
-          statusText: 'Not Modified'
-        });
-*/
 
         expect(service.state.version).toEqual(4);
         expect(service.state.lastSession).toEqual(new Session(newName));

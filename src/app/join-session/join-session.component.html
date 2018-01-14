@@ -1,3 +1,4 @@
-<form><input type="text" name="name" [(ngModel)]="participantName" placeholder="Your name...">
-  <button type="submit" (click)="joinSession(participantName)">Join Session</button>
+<form #theForm="ngForm"><input type="text" name="name" [(ngModel)]="participantName" placeholder="Your name...">
+  <button type="submit" [disabled]="theForm.invalid || !participantName?.trim()" (click)="joinSession(participantName.trim())">Join Session</button>
+  <button type="button" (click)="joinSession()">Join as Observer</button>
 </form>

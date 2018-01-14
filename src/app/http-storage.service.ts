@@ -122,7 +122,7 @@ export class HttpStorageService {
   startSession(name: string): Promise<Session> {
     console.info('startSession', name);
     this.state = new State();
-    return this.config.config
+    return this.config.getConfig()
       .mergeMap(config => {
         const url = (config.httpStoreUrl || DEFAULT_URL);
         console.debug('sending POST', url);
@@ -137,7 +137,7 @@ export class HttpStorageService {
     console.info('joinSession', id);
     if (!id) return Promise.reject('sessionId is empty');
     this.state = new State(id);
-    return this.config.config
+    return this.config.getConfig()
       .mergeMap(config => {
         const url = (config.httpStoreUrl || DEFAULT_URL) + '/' + this.state.id;
         console.debug('requesting GET', url);
@@ -170,7 +170,7 @@ export class HttpStorageService {
   updateSession(update: (session: Session) => void): Promise<Session> {
     const stoppedPolling = this.stopPolling();
     const resumePolling = stoppedPolling ? () => this.startPolling() : () => {};
-    return this.config.config
+    return this.config.getConfig()
       .mergeMap(config => {
         const session = Session.prototype.clone.call(this.state.lastSession);
         console.debug('preparing', session);
@@ -200,7 +200,7 @@ export class HttpStorageService {
 
   startPolling(): void {
     if (this.polling) return;
-    this.polling = this.config.config
+    this.polling = this.config.getConfig()
       .mergeMap(config => {
         const url = (config.httpStoreUrl || DEFAULT_URL) + '/' + this.state.id;
         console.debug('polling GET', url);

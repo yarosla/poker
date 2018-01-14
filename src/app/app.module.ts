@@ -17,7 +17,8 @@ import { VotingPadComponent } from './voting-pad/voting-pad.component';
 const appRoutes: Routes = [
   { path: 'new', component: NewSessionComponent },
   { path: 'join/:sessionId', component: JoinSessionComponent },
-  { path: 'play/:sessionId/:participantId', component: GameComponent, canActivate: [GameGuard], data: { admin: false } },
+  { path: 'play/:sessionId/:participantId', component: GameComponent, canActivate: [GameGuard] },
+  { path: 'observe/:sessionId', component: GameComponent, canActivate: [GameGuard], data: { observer: true } },
   { path: 'admin/:sessionId', component: GameComponent, canActivate: [GameGuard], data: { admin: true } },
   { path: '**', redirectTo: 'new' },
 ];

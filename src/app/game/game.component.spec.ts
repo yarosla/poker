@@ -20,7 +20,7 @@ describe('GameComponent', () => {
   when(httpStorageMock.sessionId).thenReturn('0abcd');
 
   beforeEach(async(() => {
-    const activatedRoute = new ActivatedRouteStub({}, [{path:'admin'}]);
+    const activatedRoute = new ActivatedRouteStub({}, [{path:'play'}, {path:'0abcd'}, {path:'qwe'}]);
     TestBed.configureTestingModule({
       imports: [FormsModule],
       declarations: [GameComponent, RouterLinkStubDirective, VotingPadComponent],

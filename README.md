@@ -1,27 +1,27 @@
-# Poker
+# Planning Poker
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.6.3.
+Open source implementation of planning poker game.
 
-## Development server
+The project is built on Angular 5. It uses [http-shared-storage](https://github.com/yarosla/httpstorage) 
+backend to store session data.
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+Self-contained, can be run in closed intranet environments.
 
-## Code scaffolding
+## Quick Start
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+1. Download release archive from Releases page. Unpack it.
+2. Run command:
 
-## Build
+    java -jar http-shared-storage-1.0.jar -P 8080 -s poker
+    
+3. Point your browser to `http://localhost:8080/index.html`
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `-prod` flag for a production build.
+Technologies
+------------
 
-## Running unit tests
+- Angular 5
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+Author
+------
 
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+Yaroslav Stavnichiy <yarosla@gmail.com>

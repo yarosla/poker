@@ -28,9 +28,12 @@ export class JoinSessionComponent implements OnInit {
       .subscribe((id) => {
         console.debug('params.sessionId', id);
         this.httpStorage.joinSession(id)
-          .then(() => this.httpStorage.registerParticipant(name))
+          .then((session) => name ? this.httpStorage.registerParticipant(name) : session)
           .then(() => this.httpStorage.startPolling())
-          .then(() => this.router.navigate(['play', this.httpStorage.sessionId, this.httpStorage.participantId]));
+          .then(() => this.router.navigate(
+            name ? ['play', this.httpStorage.sessionId, this.httpStorage.participantId]
+              : ['observe', this.httpStorage.sessionId]
+          ));
       });
   }
 }

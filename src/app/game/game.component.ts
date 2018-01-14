@@ -10,6 +10,7 @@ import { ActivatedRoute } from '@angular/router';
 export class GameComponent implements OnInit {
 
   isAdmin: boolean;
+  isObserver: boolean;
   session: Session;
   sessionId: string;
   newStoryNames: string;
@@ -23,11 +24,12 @@ export class GameComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.route.url.subscribe(u => {
-      this.isAdmin = u[0].path === 'admin';
+    this.route.data.subscribe(data => {
+      this.isAdmin = data.admin;
+      this.isObserver = data.observer;
     });
     this.httpStorage.getSession().subscribe(session => {
-      console.info('game start', session);
+      console.debug('game start', session);
       this.session = session;
       this.sessionId = this.httpStorage.sessionId;
       this.participants = session.participants.slice();
@@ -38,8 +40,8 @@ export class GameComponent implements OnInit {
   }
 
   hideVote(story: Story, participant: Participant): boolean {
-    return !this.isAdmin && this.currentParticipant
-      && story.votingInProgress && participant.id !== this.currentParticipant.id;
+    return !this.isAdmin && story.votingInProgress
+      && (!this.currentParticipant || participant.id !== this.currentParticipant.id);
   }
 
   addStories() {

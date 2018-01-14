@@ -38,10 +38,13 @@ export class ActivatedRouteStub {
   params = this.paramsSubject.asObservable();
   private urlSubject = new BehaviorSubject<UrlSegment[]>(this.testUrl);
   url = this.urlSubject.asObservable();
+  private dataSubject = new BehaviorSubject<{}>(this.testData);
+  data = this.dataSubject.asObservable();
 
-  constructor(params?, url?) {
+  constructor(params?, url?, data?) {
     this.testParams = params || {};
     this.testUrl = url || [];
+    this.testData = data || {};
   }
 
   private _testParams: {};
@@ -64,8 +67,17 @@ export class ActivatedRouteStub {
     this.urlSubject.next(url);
   }
 
-  // ActivatedRoute.snapshot.params
+  private _testData: {};
+  get testData() {
+    return this._testData;
+  }
+
+  set testData(data: {}) {
+    this._testData = data;
+    this.dataSubject.next(data);
+  }
+
   get snapshot() {
-    return { params: this.testParams };
+    return { params: this.testParams, url: this.testUrl, data: this.testData };
   }
 }

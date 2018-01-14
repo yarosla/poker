@@ -13,13 +13,14 @@ export class GameGuard implements CanActivate {
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
     if (this.httpStorage.sessionId) return true;
 
-    const isAdmin = route.url[0].path === 'admin';
-    console.debug('guarding', isAdmin, route.url, route.params);
+    const isAdmin: boolean = route.data.admin;
+    const isObserver: boolean = route.data.observer;
+    console.debug('guarding', isAdmin, isObserver, route.url, route.params);
 
     return this.httpStorage
       .joinSession(route.params.sessionId)
       .then(session => {
-        if (isAdmin) {
+        if (isAdmin || isObserver) {
           this.httpStorage.startPolling();
           return true;
         } else {
