@@ -19,7 +19,7 @@ export class JoinSessionComponent implements OnInit {
   ngOnInit() {
   }
 
-  joinSession(name) {
+  joinSession(name?: string) {
     this.route.params
       .map(params => {
         console.debug('params', params);
