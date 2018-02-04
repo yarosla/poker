@@ -1,4 +1,4 @@
-<div>
+<div *ngIf="deck">
   <p>Voting for <span class="story-name">{{story?.name}}</span></p>
   <button type="button" *ngFor="let score of deck" (click)="doVote(score)" [class.voted]="score===voted" [class.confirmed]="score===confirmedVote">{{score}}</button>
 </div>

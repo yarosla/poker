@@ -1,15 +1,19 @@
 <div *ngIf="session">
   <h1>{{currentParticipant?.name || (isAdmin?'Admin':'Observer')}} @ {{session.name}}
     <a routerLink="/join/{{sessionId}}" title="Invite more people to join"><i class="ti-share"></i></a></h1>
-  <app-voting-pad *ngIf="votingStory && !isAdmin && !isObserver" [story]="votingStory"
+  <app-voting-pad *ngIf="votingStory && currentParticipant" [story]="votingStory"
                   [confirmedVote]="votingStory.votes[currentParticipant.id]"
+                  [deck]="deck"
                   (vote)="httpStorage.vote($event)"></app-voting-pad>
   <table>
     <tr>
       <th class="story">Story</th>
       <th *ngFor="let participant of participants" class="score"
           [class.current]="participant.id===currentParticipant?.id">
-        <a *ngIf="isAdmin" routerLink="/play/{{sessionId}}/{{participant.id}}">{{participant.name}}</a>
+        <span *ngIf="isAdmin"><a routerLink="/play/{{sessionId}}/{{participant.id}}">{{participant.name}}</a><br>
+          <button type="button" title="Edit participant"
+                  (click)="editParticipant(participant.id)"><i class="ti-pencil"></i></button>
+        </span>
         <span *ngIf="!isAdmin">{{participant.name}}</span>
       </th>
     </tr>
@@ -39,7 +43,14 @@
     </tr>
   </table>
 
-  <form *ngIf="editing">
+  <form *ngIf="editingParticipant">
+    <input type="text" name="name" [(ngModel)]="editingParticipantName" placeholder="Participant name...">
+    <button type="submit" (click)="saveParticipantEdit()">Save</button>
+    <button type="button" (click)="cancelParticipantEdit()">Cancel</button>
+    <button type="button" (click)="deleteEditingParticipant()">Delete</button>
+  </form>
+
+  <form *ngIf="editingStory">
     <input type="text" name="name" [(ngModel)]="editingStoryName" placeholder="Story name...">
     <button type="submit" (click)="saveStoryEdit()">Save</button>
     <button type="button" (click)="cancelStoryEdit()">Cancel</button>

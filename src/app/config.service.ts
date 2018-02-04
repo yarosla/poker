@@ -6,6 +6,7 @@ import { Observable } from 'rxjs/Observable';
 export class Config {
   httpStoreUrl: string;
   pollTimeout: number | string;
+  deck?: string[]
 }
 
 @Injectable()

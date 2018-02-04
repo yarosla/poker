@@ -263,6 +263,24 @@ export class HttpStorageService {
     });
   }
 
+  editParticipant(id: string, name: string): Promise<Session> {
+    return this.updateSession(session => {
+      const participant = session.participants.find(p => p.id === id);
+      if (participant) {
+        participant.name = name;
+      }
+    });
+  }
+
+  deleteParticipant(id: string): Promise<Session> {
+    return this.updateSession(session => {
+      const participantIndex = session.participants.findIndex(p => p.id === id);
+      if (participantIndex >= 0) {
+        session.participants.splice(participantIndex, 1);
+      }
+    });
+  }
+
   moveStoryUp(id: string): Promise<Session> {
     return this.updateSession(session => {
       const stories = session.stories;

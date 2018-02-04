@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpStorageService, Participant, Session, Story } from '../http-storage.service';
 import { ActivatedRoute } from '@angular/router';
+import { ConfigService } from '../config.service';
 
 @Component({
   selector: 'app-game',
@@ -14,13 +15,16 @@ export class GameComponent implements OnInit {
   session: Session;
   sessionId: string;
   newStoryNames: string;
-  editing: string;
+  editingStory: string;
   editingStoryName: string;
+  editingParticipant: string;
+  editingParticipantName: string;
   participants: Participant[];
   currentParticipant: Participant;
   votingStory: Story;
+  deck: string[] = ['0', '0.5', '1', '2', '3', '5', '10', '20'];
 
-  constructor(private httpStorage: HttpStorageService, private route: ActivatedRoute) {
+  constructor(private httpStorage: HttpStorageService, private route: ActivatedRoute, private config: ConfigService) {
   }
 
   ngOnInit() {
@@ -36,6 +40,9 @@ export class GameComponent implements OnInit {
       this.participants.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
       this.currentParticipant = this.participants.find(p => p.id === this.httpStorage.participantId);
       this.votingStory = session.stories.find(s => s.votingInProgress);
+    });
+    this.config.getConfig().subscribe(conf => {
+      if (conf.deck) this.deck = conf.deck;
     });
   }
 
@@ -53,25 +60,53 @@ export class GameComponent implements OnInit {
   editStory(storyId: string) {
     const story = this.session.stories.find(s => s.id === storyId);
     if (story) {
-      console.info('editing', storyId);
-      this.editing = storyId;
+      console.info('editing story', storyId);
+      this.editingStory = storyId;
       this.editingStoryName = story.name;
     }
   }
 
   saveStoryEdit() {
-    if (this.editing) {
-      this.httpStorage.editStory(this.editing, this.editingStoryName);
-      this.editing = null;
+    if (this.editingStory) {
+      this.httpStorage.editStory(this.editingStory, this.editingStoryName);
+      this.editingStory = null;
       this.editingStoryName = null;
     }
   }
 
   cancelStoryEdit() {
-    if (this.editing) {
-      this.editing = null;
+    if (this.editingStory) {
+      this.editingStory = null;
       this.editingStoryName = null;
     }
+  }
+
+  editParticipant(participantId: string) {
+    const participant = this.session.participants.find(p => p.id === participantId);
+    if (participant) {
+      console.info('editing participant', participantId);
+      this.editingParticipant = participantId;
+      this.editingParticipantName = participant.name;
+    }
+  }
+
+  saveParticipantEdit() {
+    if (this.editingParticipant) {
+      this.httpStorage.editParticipant(this.editingParticipant, this.editingParticipantName);
+      this.cancelParticipantEdit();
+    }
+  }
+
+  deleteEditingParticipant() {
+    if (this.editingParticipant) {
+      this.httpStorage.deleteParticipant(this.editingParticipant);
+      this.cancelParticipantEdit();
+    }
+  }
+
+  cancelParticipantEdit() {
+    this.editingParticipant = null;
+    this.editingParticipantName = null;
   }
 
   saveReport(): void {

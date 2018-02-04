@@ -10,12 +10,13 @@ export class VotingPadComponent implements OnInit {
 
   @Input() story: Story;
   @Input() confirmedVote: string;
-  @Input() deck: string[] = ['0', '0.5', '1', '2', '3', '5', '10', '20'];
+  @Input() deck: string[];
   @Output() vote = new EventEmitter();
 
   private voted: string;
 
-  constructor() { }
+  constructor() {
+  }
 
   ngOnInit() {
   }
