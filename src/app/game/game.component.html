@@ -3,7 +3,7 @@
     <a routerLink="/join/{{sessionId}}" title="Invite more people to join"><i class="ti-share"></i></a></h1>
   <app-voting-pad *ngIf="votingStory && currentParticipant" [story]="votingStory"
                   [confirmedVote]="votingStory.votes[currentParticipant.id]"
-                  [deck]="deck"
+                  [deck]="session.deck"
                   (vote)="httpStorage.vote($event)"></app-voting-pad>
   <table>
     <tr>

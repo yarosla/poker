@@ -63,15 +63,18 @@ export class Session {
   name: string;
   participants: Participant[] = [];
   stories: Story[] = [];
+  deck: string[] = ['0', '0.5', '1', '2', '3', '5', '10', '20'];
 
-  constructor(name?: string) {
+  constructor(name?: string, deck?: string[]) {
     this.name = name;
+    if (deck) this.deck = deck;
   }
 
   clone(): Session {
     const session = new Session(this.name);
     session.participants = this.participants.map(p => Participant.prototype.clone.call(p));
     session.stories = this.stories.map(s => Story.prototype.clone.call(s));
+    session.deck = this.deck.slice();
     return session;
   }
 }
@@ -119,14 +122,14 @@ export class HttpStorageService {
     console.debug('got state', this.state);
   };
 
-  startSession(name: string): Promise<Session> {
+  startSession(name: string, deck?: string[]): Promise<Session> {
     console.info('startSession', name);
     this.state = new State();
     return this.config.getConfig()
       .mergeMap(config => {
         const url = (config.httpStoreUrl || DEFAULT_URL);
         console.debug('sending POST', url);
-        return this.http.post<Session>(url, new Session(name), { observe: 'response' })
+        return this.http.post<Session>(url, new Session(name, deck), { observe: 'response' })
           .do(this.stateExtractor)
           .map((r: HttpResponse<Session>) => r.body);
       })

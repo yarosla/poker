@@ -3,11 +3,8 @@
 Open source implementation of planning poker game.
 
 - The game has three roles: admin, players, observers.
-- Cards: 0, 0.5, 1, 2, 3, 5, 10, 20, ? (configurable via `config.json`)
+- Multiple card decks configurable via `config.json`
 - Self-contained, can be run in closed intranet environments.
-
-The project is built on Angular 5. It uses [http-shared-storage](https://github.com/yarosla/httpstorage) 
-backend to store session data.
 
 ## Quick Start
 
@@ -21,7 +18,8 @@ backend to store session data.
 
 ## Technologies
 
-- Angular 5
+The project is built on Angular 5. It uses [http-shared-storage](https://github.com/yarosla/httpstorage) 
+backend to store session data.
 
 ## Author
 

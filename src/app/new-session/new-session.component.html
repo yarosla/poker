@@ -1,3 +1,6 @@
 <form #theForm="ngForm"><input type="text" name="name" required [(ngModel)]="newSessionName" placeholder="Session name...">
-  <button type="submit" [disabled]="theForm.invalid || !newSessionName?.trim()" (click)="startSession(newSessionName.trim())">Start Session</button>
+  <select name="deck" [(ngModel)]="selectedDeck" [compareWith]="compareDecks">
+    <option *ngFor="let d of decks" [ngValue]="d">{{d.name}}</option>
+  </select>
+  <button type="submit" [disabled]="theForm.invalid || !newSessionName?.trim()" (click)="startSession()">Start Session</button>
 </form>

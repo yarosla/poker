@@ -8,7 +8,6 @@ import { GameComponent } from './game.component';
 import { HttpStorageService, Session } from '../http-storage.service';
 import { ActivatedRouteStub, RouterLinkStubDirective, RouterStub } from '../../testing/router-stubs';
 import { VotingPadComponent } from '../voting-pad/voting-pad.component';
-import { Config, ConfigService } from '../config.service';
 
 describe('GameComponent', () => {
   let component: GameComponent;
@@ -20,10 +19,6 @@ describe('GameComponent', () => {
   });
   when(httpStorageMock.sessionId).thenReturn('0abcd');
 
-  const configMock = mock(ConfigService);
-  const configObservable = Observable.of<Config>({ httpStoreUrl: '', pollTimeout: 0, deck: ['1'] });
-  when(configMock.getConfig()).thenReturn(configObservable);
-
   beforeEach(async(() => {
     const activatedRoute = new ActivatedRouteStub({}, [{ path: 'play' }, { path: '0abcd' }, { path: 'qwe' }]);
     TestBed.configureTestingModule({
@@ -33,7 +28,6 @@ describe('GameComponent', () => {
         { provide: HttpStorageService, useValue: instance(httpStorageMock) },
         { provide: Router, useClass: RouterStub },
         { provide: ActivatedRoute, useValue: activatedRoute },
-        { provide: ConfigService, useValue: instance(configMock) },
       ]
     })
       .compileComponents();

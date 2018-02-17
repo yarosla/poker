@@ -22,9 +22,8 @@ export class GameComponent implements OnInit {
   participants: Participant[];
   currentParticipant: Participant;
   votingStory: Story;
-  deck: string[] = ['0', '0.5', '1', '2', '3', '5', '10', '20'];
 
-  constructor(private httpStorage: HttpStorageService, private route: ActivatedRoute, private config: ConfigService) {
+  constructor(public httpStorage: HttpStorageService, private route: ActivatedRoute) {
   }
 
   ngOnInit() {
@@ -40,9 +39,6 @@ export class GameComponent implements OnInit {
       this.participants.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
       this.currentParticipant = this.participants.find(p => p.id === this.httpStorage.participantId);
       this.votingStory = session.stories.find(s => s.votingInProgress);
-    });
-    this.config.getConfig().subscribe(conf => {
-      if (conf.deck) this.deck = conf.deck;
     });
   }
 

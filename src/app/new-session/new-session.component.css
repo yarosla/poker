@@ -5,9 +5,15 @@ form button {
   cursor: pointer;
 }
 
-form input[type="text"]{
+form input[type="text"] {
   width: 300px;
   background-color: white;
   border: solid 1px #aaa;
   padding: 4px 6px;
+}
+
+form select {
+  background-color: white;
+  border: solid 1px #aaa;
+  padding: 3px 6px;
 }

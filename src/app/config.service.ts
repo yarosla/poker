@@ -3,10 +3,15 @@ import { HttpClient } from '@angular/common/http';
 import { ReplaySubject } from 'rxjs/ReplaySubject';
 import { Observable } from 'rxjs/Observable';
 
+export class Deck {
+  name: string;
+  cards: string[]
+}
+
 export class Config {
   httpStoreUrl: string;
   pollTimeout: number | string;
-  deck?: string[]
+  decks?: Deck[]
 }
 
 @Injectable()
