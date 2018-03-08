@@ -6,6 +6,12 @@ Open source implementation of planning poker game.
 - Multiple card decks configurable via `config.json`
 - Self-contained, can be run in closed intranet environments.
 
+## Working Service
+
+http://poker.nexoft.ru/index.html
+
+Note that sessions expire over time.
+
 ## Quick Start
 
 1. Download release archive from [Releases](https://github.com/yarosla/poker/releases) page. Unpack it.
